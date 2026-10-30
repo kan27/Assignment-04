@@ -9,9 +9,25 @@ def ssort(a):
         L[i], L[m] = L[m], L[i]
     return L
 
+def pivot_first(a):
+    return a[0]
+
+def pivot_random(a):
+    return random.choice(a)
 
 def qsort(a, pivot_fn):
     ## TO DO
+    if len(a) <= 1:
+        return a
+    
+    pivot = pivot_fn(a)
+    
+    # Partition elements relative to pivot
+    left = [x for x in a if x < pivot]
+    middle = [x for x in a if x == pivot]
+    right = [x for x in a if x > pivot]
+    
+    return qsort(left, pivot_fn) + middle + qsort(right, pivot_fn)
     pass
     
 def time_sort(sort_fn, mylist):
@@ -47,16 +63,14 @@ def compare_sort(sizes=[100, 200, 400, 800]): #, 1600, 3200, 6400, 12800, 25600,
       for each method to run on each value of n
     """
     ### TODO - sorting algorithms for comparison
-    qsort_fixed_pivot = #
-    qsort_random_pivot = #
-    # tim_sort = sorted
+    qsort_fixed_pivot = lambda L: qsort(L, pivot_first)
+    qsort_random_pivot = lambda L: qsort(L, pivot_random)
     result = []
     for size in sizes:
-        # create list in ascending order
         mylist = list(range(size))
 
         # shuffles list if needed
-        #random.shuffle(mylist)
+        random.shuffle(mylist)
 
         result.append([
             len(mylist),
@@ -66,13 +80,33 @@ def compare_sort(sizes=[100, 200, 400, 800]): #, 1600, 3200, 6400, 12800, 25600,
         ])
     return result
     ###
+def compare_timsort(sizes=[1000, 5000, 10000, 50000, 100000]):
+    """ For Question 3c: Comparing random-pivot qsort vs Python sorted """
+    qsort_random_pivot = lambda L: qsort(L, pivot_random)
+    tim_sort = sorted
+    
+    result = []
+    for size in sizes:
+        mylist = list(range(size))
+        random.shuffle(mylist)
+
+        result.append([
+            len(mylist),
+            time_sort(qsort_random_pivot, mylist),
+            time_sort(tim_sort, mylist)
+        ])
+    return result
 
 def print_results(results):
     """ change as needed for comparisons """
+    # headers = ['n', 'ssort', 'qsort-fixed-pivot', 'qsort-random-pivot']
+    
+    headers = ['n', 'qsort-random-pivot', 'tim-sort']
+
     print(tabulate.tabulate(results,
-                            headers=['n', 'ssort', 'qsort-fixed-pivot', 'qsort-random-pivot'],
+                            headers=headers,
                             floatfmt=".3f",
                             tablefmt="github"))
 
 random.seed()
-# print_results(compare_sort()) # ensure this is commented out when you submit
+print_results(compare_timsort()) # ensure this is commented out when you submit
